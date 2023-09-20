@@ -17,15 +17,15 @@ ON categories.category_id = products.category_id
 GROUP BY category_name;
 
 -- 3
-SELECT contact_name, AVG((order_details.unit_price * order_details.quantity) * (1 - discount)) AS avg_sum
-FROM orders INNER JOIN customers
-ON orders.customer_id = customers.customer_id
-INNER JOIN order_details
+SELECT contact_name, AVG(total_sum.total) AS result_avg FROM customers 
+INNER JOIN 
+(SELECT orders.customer_id , SUM((order_details.unit_price * order_details.quantity) * (1 - discount)) AS total 
+FROM orders INNER JOIN order_details
 ON orders.order_id = order_details.order_id
+GROUP BY orders.order_id) AS total_sum 
+ON customers.customer_id = total_sum.customer_id
 GROUP BY contact_name
--- , orders.order_id
--- ORDER BY Orders.order_id DESC;
-ORDER BY avg_sum DESC;
+ORDER BY result_avg DESC
 
 -- 4
 SELECT contact_name, sum((order_details.unit_price * order_details.quantity) * (1 - discount)) AS total_sum
@@ -81,6 +81,5 @@ FROM products
 INNER JOIN order_details
 ON order_details.product_id IS NULL
 GROUP BY product_name
-
 
 
